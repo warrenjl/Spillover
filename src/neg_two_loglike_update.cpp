@@ -1,5 +1,5 @@
 #include "RcppArmadillo.h"
-#include "CWVS.h"
+#include "Spillover.h"
 using namespace arma;
 using namespace Rcpp;
 
@@ -8,17 +8,18 @@ using namespace Rcpp;
 
 double neg_two_loglike_update(arma::vec y,
                               arma::mat x,
+                              arma::vec spillover_covar,
                               arma::mat z, 
                               arma::vec beta,
-                              arma::vec gamma,
-                              double A11,
-                              arma::vec delta1){
+                              double lambda,
+                              arma::vec w){
 
 int n = y.size();
 arma::vec dens(n); dens.fill(0);
 
-arma::vec logit_probs = x*beta + 
-                        z*(gamma%(A11*delta1));
+arma::vec logit_probs = x*beta +
+                        spillover_covar*lambda +
+                        z*w;
 
 arma::vec probs = exp(logit_probs)/(1 + exp(logit_probs));
 

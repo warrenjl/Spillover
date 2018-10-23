@@ -24,7 +24,7 @@
 //#include <omp.h>
 
 #include "RcppArmadillo.h"
-#include "CWVS.h"
+#include "Spillover.h"
 using namespace arma;
 using namespace Rcpp;
 
