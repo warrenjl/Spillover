@@ -30,7 +30,7 @@ double second = -0.50*dot((gamma - x*beta - spillover_covar_old*lambda - z*w), (
 
 /*First*/
 double theta_trans = R::rnorm(theta_trans_old, 
-                             sqrt(metrop_var_theta_trans));
+                              sqrt(metrop_var_theta_trans));
 double theta = (b_theta*exp(theta_trans) + a_theta)/(1 + exp(theta_trans));
 arma::vec spillover_covar = (distance_to_ps <= theta)%exp(-(distance_to_ps%distance_to_ps));
 
@@ -46,7 +46,7 @@ if(ratio < R::runif(0, 1)){
   acc = 0;
   }
 acctot_theta_trans = acctot_theta_trans + 
-                    acc;
+                     acc;
 
 return Rcpp::List::create(Rcpp::Named("theta") = theta,
                           Rcpp::Named("acctot_theta_trans") = acctot_theta_trans);

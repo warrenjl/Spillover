@@ -39,6 +39,9 @@ arma::vec sigma2_w(mcmc_samples); sigma2_w.fill(0);
 arma::vec neg_two_loglike(mcmc_samples); neg_two_loglike.fill(0);
   
 //Prior Information
+double a_theta = a_theta_prior;
+double b_theta = b_theta_prior;
+
 double sigma2_beta = 10000;
 if(sigma2_beta_prior.isNotNull()){
   sigma2_beta = Rcpp::as<double>(sigma2_beta_prior);
@@ -187,8 +190,8 @@ for(int j = 1; j < mcmc_samples; ++j){
                                           beta.col(j),
                                           lambda(j),
                                           w.col(j),
-                                          a_theta_prior,
-                                          b_theta_prior,
+                                          a_theta,
+                                          b_theta,
                                           metrop_var_theta_trans,
                                           acctot_theta_trans);
    

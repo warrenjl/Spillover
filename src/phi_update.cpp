@@ -50,7 +50,7 @@ if(ratio < R::runif(0, 1)){
   acc = 0;
   }
 acctot_phi_trans = acctot_phi_trans + 
-                    acc;
+                   acc;
 
 return Rcpp::List::create(Rcpp::Named("phi") = phi,
                           Rcpp::Named("acctot_phi_trans") = acctot_phi_trans,
