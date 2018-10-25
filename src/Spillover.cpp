@@ -16,8 +16,8 @@ Rcpp::List Spillover(int mcmc_samples,
                      double b_theta_prior,
                      double metrop_var_phi_trans,
                      double metrop_var_theta_trans,
-                     Rcpp::Nullable<double> sigma2_beta_prior = R_NilValue,
-                     Rcpp::Nullable<double> sigma2_lambda_prior = R_NilValue,
+                     Rcpp::Nullable<double> alpha_g_prior = R_NilValue,
+                     Rcpp::Nullable<double> beta_g_prior = R_NilValue,
                      Rcpp::Nullable<double> alpha_phi_prior = R_NilValue,
                      Rcpp::Nullable<double> beta_phi_prior = R_NilValue,
                      Rcpp::Nullable<double> alpha_sigma2_w_prior = R_NilValue,
@@ -25,6 +25,7 @@ Rcpp::List Spillover(int mcmc_samples,
                      Rcpp::Nullable<Rcpp::NumericVector> beta_init = R_NilValue,
                      Rcpp::Nullable<double> lambda_init = R_NilValue,
                      Rcpp::Nullable<Rcpp::NumericVector> w_init = R_NilValue,
+                     Rcpp::Nullable<double> g_init = R_NilValue,
                      Rcpp::Nullable<double> phi_init = R_NilValue,
                      Rcpp::Nullable<double> theta_init = R_NilValue,
                      Rcpp::Nullable<double> sigma2_w_init = R_NilValue){
@@ -33,6 +34,7 @@ Rcpp::List Spillover(int mcmc_samples,
 arma::mat beta(x.n_cols, mcmc_samples); beta.fill(0);
 arma::vec lambda(mcmc_samples); lambda.fill(0);
 arma::mat w(z.n_cols, mcmc_samples); w.fill(0);
+arma::vec g(mcmc_samples); g.fill(0);
 arma::vec phi(mcmc_samples); phi.fill(0);
 arma::vec theta(mcmc_samples); theta.fill(0);
 arma::vec sigma2_w(mcmc_samples); sigma2_w.fill(0);
@@ -42,14 +44,14 @@ arma::vec neg_two_loglike(mcmc_samples); neg_two_loglike.fill(0);
 double a_theta = a_theta_prior;
 double b_theta = b_theta_prior;
 
-double sigma2_beta = 10000;
-if(sigma2_beta_prior.isNotNull()){
-  sigma2_beta = Rcpp::as<double>(sigma2_beta_prior);
+double alpha_g = 3.00;
+if(alpha_g_prior.isNotNull()){
+  alpha_g = Rcpp::as<double>(alpha_g_prior);
   }
 
-double sigma2_lambda = 1.00;
-if(sigma2_lambda_prior.isNotNull()){
-  sigma2_lambda = Rcpp::as<double>(sigma2_lambda_prior);
+double beta_g = 2.00;
+if(beta_g_prior.isNotNull()){
+  beta_g = Rcpp::as<double>(beta_g_prior);
   }
   
 double alpha_phi = 1.00;
@@ -86,6 +88,11 @@ if(lambda_init.isNotNull()){
 w.col(0).fill(0);
 if(w_init.isNotNull()){
   w.col(0) = Rcpp::as<arma::vec>(w_init);
+  }
+
+g(0) = 1.00;
+if(g_init.isNotNull()){
+  g(0) = Rcpp::as<double>(g_init);
   }
 
 phi(0) = 0.50*max(distance_to_ps);
@@ -142,11 +149,18 @@ for(int j = 1; j < mcmc_samples; ++j){
                                               w_aux,
                                               gamma,
                                               w.col(j-1),
-                                              sigma2_beta,
-                                              sigma2_lambda);
+                                              g(j-1));
    
    beta.col(j) = beta_lambda.subvec(0, (x.n_cols - 1));
    lambda(j) = beta_lambda(x.n_cols);
+   
+   //g update
+   g(j) = g_update(x,
+                   spillover_covar,
+                   beta.col(j),
+                   lambda(j),
+                   alpha_g,
+                   beta_g);
   
    //w Update
    w.col(j) = w_update(x,
@@ -159,7 +173,7 @@ for(int j = 1; j < mcmc_samples; ++j){
                        sigma2_w(j-1),
                        spatial_corr_info[0]);
    
-   //sigma2_w_update
+   //sigma2_w update
    sigma2_w(j) = sigma2_w_update(w.col(j),
                                  spatial_corr_info[0],
                                  alpha_sigma2_w,
@@ -190,6 +204,7 @@ for(int j = 1; j < mcmc_samples; ++j){
                                           beta.col(j),
                                           lambda(j),
                                           w.col(j),
+                                          g(j),
                                           a_theta,
                                           b_theta,
                                           metrop_var_theta_trans,
@@ -228,6 +243,7 @@ for(int j = 1; j < mcmc_samples; ++j){
 return Rcpp::List::create(Rcpp::Named("beta") = beta,
                           Rcpp::Named("lambda") = lambda,
                           Rcpp::Named("w") = w,
+                          Rcpp::Named("g") = g,
                           Rcpp::Named("sigma2_w") = sigma2_w,
                           Rcpp::Named("phi") = phi,
                           Rcpp::Named("theta") = theta,
