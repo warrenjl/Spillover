@@ -15,7 +15,8 @@ Rcpp::List theta_update(arma::mat x,
                         arma::vec beta,
                         double lambda,
                         arma::vec w,
-                        double g,
+                        arma::vec spillover_covar_temp,
+                        int spillover_covar_def,
                         double a_theta,
                         double b_theta,
                         double metrop_var_theta_trans,
@@ -27,15 +28,16 @@ beta_lambda(x.n_cols) = lambda;
   
 /*Second*/
 double theta_trans_old = log((theta_old - a_theta)/(b_theta - theta_old));
-arma::vec spillover_covar_old = (distance_to_ps <= theta_old)%exp(-(distance_to_ps%distance_to_ps));
+arma::vec spillover_covar_old = (distance_to_ps <= theta_old)%spillover_covar_temp;
+if(spillover_covar_def == 2){
+  spillover_covar_old = (distance_to_ps <= theta_old)%exp(-distance_to_ps);
+  }
+if(spillover_covar_def == 3){
+  spillover_covar_old = (distance_to_ps <= theta_old)%exp(-(distance_to_ps%distance_to_ps));
+  }
 arma::mat x_full_old = join_rows(x, spillover_covar_old);
-double log_deter_old = 0; 
-double sign_old = 0;     
-log_det(log_deter_old, sign_old, inv_sympd(trans(x_full_old)*x_full_old));
 
-double second = -0.50*dot((gamma - x_full_old*beta_lambda - z*w), (w_aux%(gamma - x_full_old*beta_lambda - z*w))) -
-                0.50*log_deter_old -
-                (0.50/g)*dot(beta_lambda, (trans(x_full_old)*x_full_old)*beta_lambda) +
+double second = -0.50*dot((gamma - x_full_old*beta_lambda - z*w), (w_aux%(gamma - x_full_old*beta_lambda - z*w))) +
                 theta_trans_old -
                 2*log(1 + exp(theta_trans_old));
 
@@ -43,15 +45,16 @@ double second = -0.50*dot((gamma - x_full_old*beta_lambda - z*w), (w_aux%(gamma 
 double theta_trans = R::rnorm(theta_trans_old, 
                               sqrt(metrop_var_theta_trans));
 double theta = (b_theta*exp(theta_trans) + a_theta)/(1 + exp(theta_trans));
-arma::vec spillover_covar = (distance_to_ps <= theta)%exp(-(distance_to_ps%distance_to_ps));
+arma::vec spillover_covar = (distance_to_ps <= theta)%spillover_covar_temp;
+if(spillover_covar_def == 2){
+  spillover_covar = (distance_to_ps <= theta)%exp(-distance_to_ps);
+  }
+if(spillover_covar_def == 3){
+  spillover_covar = (distance_to_ps <= theta)%exp(-(distance_to_ps%distance_to_ps));
+  }
 arma::mat x_full = join_rows(x, spillover_covar);
-double log_deter = 0; 
-double sign = 0;     
-log_det(log_deter, sign, inv_sympd(trans(x_full)*x_full));
 
-double first = -0.50*dot((gamma - x_full*beta_lambda - z*w), (w_aux%(gamma - x_full*beta_lambda - z*w))) -
-               0.50*log_deter -
-               (0.50/g)*dot(beta_lambda, (trans(x_full)*x_full)*beta_lambda) + 
+double first = -0.50*dot((gamma - x_full*beta_lambda - z*w), (w_aux%(gamma - x_full*beta_lambda - z*w))) +
                theta_trans -
                2*log(1 + exp(theta_trans));
 

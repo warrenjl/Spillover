@@ -12,7 +12,7 @@ arma::vec beta_lambda_update(arma::mat x,
                              arma::vec w_aux,
                              arma::vec gamma,
                              arma::vec w_old,
-                             double g_old){
+                             double sigma2_regress){
 
 arma::mat x_full = join_rows(x, spillover_covar);
 int p_x_full = x_full.n_cols;
@@ -26,7 +26,7 @@ for(int j = 0; j < p_x_full; ++j){
 arma::mat x_full_trans = trans(x_full);
 
 arma::mat cov_beta_lambda = inv_sympd(x_full_trans*(w_aux_mat%x_full) + 
-                                      x_full_trans*x_full/g_old);
+                                      eye(p_x_full, p_x_full)/sigma2_regress);
 
 arma::vec mean_beta_lambda = cov_beta_lambda*(x_full_trans*(w_aux%(gamma - z*w_old)));
 

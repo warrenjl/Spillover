@@ -7,8 +7,8 @@
 using namespace Rcpp;
 
 // beta_lambda_update
-arma::vec beta_lambda_update(arma::mat x, arma::vec spillover_covar, arma::mat z, arma::vec w_aux, arma::vec gamma, arma::vec w_old, double g_old);
-RcppExport SEXP _Spillover_beta_lambda_update(SEXP xSEXP, SEXP spillover_covarSEXP, SEXP zSEXP, SEXP w_auxSEXP, SEXP gammaSEXP, SEXP w_oldSEXP, SEXP g_oldSEXP) {
+arma::vec beta_lambda_update(arma::mat x, arma::vec spillover_covar, arma::mat z, arma::vec w_aux, arma::vec gamma, arma::vec w_old, double sigma2_regress);
+RcppExport SEXP _Spillover_beta_lambda_update(SEXP xSEXP, SEXP spillover_covarSEXP, SEXP zSEXP, SEXP w_auxSEXP, SEXP gammaSEXP, SEXP w_oldSEXP, SEXP sigma2_regressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -18,24 +18,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec >::type w_aux(w_auxSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type gamma(gammaSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type w_old(w_oldSEXP);
-    Rcpp::traits::input_parameter< double >::type g_old(g_oldSEXP);
-    rcpp_result_gen = Rcpp::wrap(beta_lambda_update(x, spillover_covar, z, w_aux, gamma, w_old, g_old));
-    return rcpp_result_gen;
-END_RCPP
-}
-// g_update
-double g_update(arma::mat x, arma::vec spillover_covar, arma::vec beta, double lambda, double alpha_g, double beta_g);
-RcppExport SEXP _Spillover_g_update(SEXP xSEXP, SEXP spillover_covarSEXP, SEXP betaSEXP, SEXP lambdaSEXP, SEXP alpha_gSEXP, SEXP beta_gSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type x(xSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type spillover_covar(spillover_covarSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type beta(betaSEXP);
-    Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
-    Rcpp::traits::input_parameter< double >::type alpha_g(alpha_gSEXP);
-    Rcpp::traits::input_parameter< double >::type beta_g(beta_gSEXP);
-    rcpp_result_gen = Rcpp::wrap(g_update(x, spillover_covar, beta, lambda, alpha_g, beta_g));
+    Rcpp::traits::input_parameter< double >::type sigma2_regress(sigma2_regressSEXP);
+    rcpp_result_gen = Rcpp::wrap(beta_lambda_update(x, spillover_covar, z, w_aux, gamma, w_old, sigma2_regress));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -157,23 +141,23 @@ BEGIN_RCPP
 END_RCPP
 }
 // Spillover
-Rcpp::List Spillover(int mcmc_samples, arma::vec y, arma::mat x, arma::vec distance_to_ps, arma::mat z, arma::mat spatial_dists, double a_theta_prior, double b_theta_prior, double metrop_var_phi_trans, double metrop_var_theta_trans, Rcpp::Nullable<double> alpha_g_prior, Rcpp::Nullable<double> beta_g_prior, Rcpp::Nullable<double> alpha_phi_prior, Rcpp::Nullable<double> beta_phi_prior, Rcpp::Nullable<double> alpha_sigma2_w_prior, Rcpp::Nullable<double> beta_sigma2_w_prior, Rcpp::Nullable<Rcpp::NumericVector> beta_init, Rcpp::Nullable<double> lambda_init, Rcpp::Nullable<Rcpp::NumericVector> w_init, Rcpp::Nullable<double> g_init, Rcpp::Nullable<double> phi_init, Rcpp::Nullable<double> theta_init, Rcpp::Nullable<double> sigma2_w_init);
-RcppExport SEXP _Spillover_Spillover(SEXP mcmc_samplesSEXP, SEXP ySEXP, SEXP xSEXP, SEXP distance_to_psSEXP, SEXP zSEXP, SEXP spatial_distsSEXP, SEXP a_theta_priorSEXP, SEXP b_theta_priorSEXP, SEXP metrop_var_phi_transSEXP, SEXP metrop_var_theta_transSEXP, SEXP alpha_g_priorSEXP, SEXP beta_g_priorSEXP, SEXP alpha_phi_priorSEXP, SEXP beta_phi_priorSEXP, SEXP alpha_sigma2_w_priorSEXP, SEXP beta_sigma2_w_priorSEXP, SEXP beta_initSEXP, SEXP lambda_initSEXP, SEXP w_initSEXP, SEXP g_initSEXP, SEXP phi_initSEXP, SEXP theta_initSEXP, SEXP sigma2_w_initSEXP) {
+Rcpp::List Spillover(int mcmc_samples, int spillover_covar_def, arma::vec y, arma::mat x, arma::vec distance_to_ps, arma::mat z, arma::mat spatial_dists, double metrop_var_phi_trans, double metrop_var_theta_trans, Rcpp::Nullable<double> sigma2_regress_prior, Rcpp::Nullable<double> a_theta_prior, Rcpp::Nullable<double> b_theta_prior, Rcpp::Nullable<double> alpha_phi_prior, Rcpp::Nullable<double> beta_phi_prior, Rcpp::Nullable<double> alpha_sigma2_w_prior, Rcpp::Nullable<double> beta_sigma2_w_prior, Rcpp::Nullable<Rcpp::NumericVector> beta_init, Rcpp::Nullable<double> lambda_init, Rcpp::Nullable<Rcpp::NumericVector> w_init, Rcpp::Nullable<double> phi_init, Rcpp::Nullable<double> theta_init, Rcpp::Nullable<double> sigma2_w_init);
+RcppExport SEXP _Spillover_Spillover(SEXP mcmc_samplesSEXP, SEXP spillover_covar_defSEXP, SEXP ySEXP, SEXP xSEXP, SEXP distance_to_psSEXP, SEXP zSEXP, SEXP spatial_distsSEXP, SEXP metrop_var_phi_transSEXP, SEXP metrop_var_theta_transSEXP, SEXP sigma2_regress_priorSEXP, SEXP a_theta_priorSEXP, SEXP b_theta_priorSEXP, SEXP alpha_phi_priorSEXP, SEXP beta_phi_priorSEXP, SEXP alpha_sigma2_w_priorSEXP, SEXP beta_sigma2_w_priorSEXP, SEXP beta_initSEXP, SEXP lambda_initSEXP, SEXP w_initSEXP, SEXP phi_initSEXP, SEXP theta_initSEXP, SEXP sigma2_w_initSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< int >::type mcmc_samples(mcmc_samplesSEXP);
+    Rcpp::traits::input_parameter< int >::type spillover_covar_def(spillover_covar_defSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
     Rcpp::traits::input_parameter< arma::mat >::type x(xSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type distance_to_ps(distance_to_psSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type z(zSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type spatial_dists(spatial_distsSEXP);
-    Rcpp::traits::input_parameter< double >::type a_theta_prior(a_theta_priorSEXP);
-    Rcpp::traits::input_parameter< double >::type b_theta_prior(b_theta_priorSEXP);
     Rcpp::traits::input_parameter< double >::type metrop_var_phi_trans(metrop_var_phi_transSEXP);
     Rcpp::traits::input_parameter< double >::type metrop_var_theta_trans(metrop_var_theta_transSEXP);
-    Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type alpha_g_prior(alpha_g_priorSEXP);
-    Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type beta_g_prior(beta_g_priorSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type sigma2_regress_prior(sigma2_regress_priorSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type a_theta_prior(a_theta_priorSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type b_theta_prior(b_theta_priorSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type alpha_phi_prior(alpha_phi_priorSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type beta_phi_prior(beta_phi_priorSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type alpha_sigma2_w_prior(alpha_sigma2_w_priorSEXP);
@@ -181,17 +165,16 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::NumericVector> >::type beta_init(beta_initSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type lambda_init(lambda_initSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::NumericVector> >::type w_init(w_initSEXP);
-    Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type g_init(g_initSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type phi_init(phi_initSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type theta_init(theta_initSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type sigma2_w_init(sigma2_w_initSEXP);
-    rcpp_result_gen = Rcpp::wrap(Spillover(mcmc_samples, y, x, distance_to_ps, z, spatial_dists, a_theta_prior, b_theta_prior, metrop_var_phi_trans, metrop_var_theta_trans, alpha_g_prior, beta_g_prior, alpha_phi_prior, beta_phi_prior, alpha_sigma2_w_prior, beta_sigma2_w_prior, beta_init, lambda_init, w_init, g_init, phi_init, theta_init, sigma2_w_init));
+    rcpp_result_gen = Rcpp::wrap(Spillover(mcmc_samples, spillover_covar_def, y, x, distance_to_ps, z, spatial_dists, metrop_var_phi_trans, metrop_var_theta_trans, sigma2_regress_prior, a_theta_prior, b_theta_prior, alpha_phi_prior, beta_phi_prior, alpha_sigma2_w_prior, beta_sigma2_w_prior, beta_init, lambda_init, w_init, phi_init, theta_init, sigma2_w_init));
     return rcpp_result_gen;
 END_RCPP
 }
 // theta_update
-Rcpp::List theta_update(arma::mat x, arma::mat z, arma::vec distance_to_ps, double theta_old, arma::vec w_aux, arma::vec gamma, arma::vec beta, double lambda, arma::vec w, double g, double a_theta, double b_theta, double metrop_var_theta_trans, double acctot_theta_trans);
-RcppExport SEXP _Spillover_theta_update(SEXP xSEXP, SEXP zSEXP, SEXP distance_to_psSEXP, SEXP theta_oldSEXP, SEXP w_auxSEXP, SEXP gammaSEXP, SEXP betaSEXP, SEXP lambdaSEXP, SEXP wSEXP, SEXP gSEXP, SEXP a_thetaSEXP, SEXP b_thetaSEXP, SEXP metrop_var_theta_transSEXP, SEXP acctot_theta_transSEXP) {
+Rcpp::List theta_update(arma::mat x, arma::mat z, arma::vec distance_to_ps, double theta_old, arma::vec w_aux, arma::vec gamma, arma::vec beta, double lambda, arma::vec w, arma::vec spillover_covar_temp, int spillover_covar_def, double a_theta, double b_theta, double metrop_var_theta_trans, double acctot_theta_trans);
+RcppExport SEXP _Spillover_theta_update(SEXP xSEXP, SEXP zSEXP, SEXP distance_to_psSEXP, SEXP theta_oldSEXP, SEXP w_auxSEXP, SEXP gammaSEXP, SEXP betaSEXP, SEXP lambdaSEXP, SEXP wSEXP, SEXP spillover_covar_tempSEXP, SEXP spillover_covar_defSEXP, SEXP a_thetaSEXP, SEXP b_thetaSEXP, SEXP metrop_var_theta_transSEXP, SEXP acctot_theta_transSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -204,12 +187,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec >::type beta(betaSEXP);
     Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type w(wSEXP);
-    Rcpp::traits::input_parameter< double >::type g(gSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type spillover_covar_temp(spillover_covar_tempSEXP);
+    Rcpp::traits::input_parameter< int >::type spillover_covar_def(spillover_covar_defSEXP);
     Rcpp::traits::input_parameter< double >::type a_theta(a_thetaSEXP);
     Rcpp::traits::input_parameter< double >::type b_theta(b_thetaSEXP);
     Rcpp::traits::input_parameter< double >::type metrop_var_theta_trans(metrop_var_theta_transSEXP);
     Rcpp::traits::input_parameter< double >::type acctot_theta_trans(acctot_theta_transSEXP);
-    rcpp_result_gen = Rcpp::wrap(theta_update(x, z, distance_to_ps, theta_old, w_aux, gamma, beta, lambda, w, g, a_theta, b_theta, metrop_var_theta_trans, acctot_theta_trans));
+    rcpp_result_gen = Rcpp::wrap(theta_update(x, z, distance_to_ps, theta_old, w_aux, gamma, beta, lambda, w, spillover_covar_temp, spillover_covar_def, a_theta, b_theta, metrop_var_theta_trans, acctot_theta_trans));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -252,7 +236,6 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_Spillover_beta_lambda_update", (DL_FUNC) &_Spillover_beta_lambda_update, 7},
-    {"_Spillover_g_update", (DL_FUNC) &_Spillover_g_update, 6},
     {"_Spillover_neg_two_loglike_update", (DL_FUNC) &_Spillover_neg_two_loglike_update, 7},
     {"_Spillover_phi_update", (DL_FUNC) &_Spillover_phi_update, 9},
     {"_Spillover_rcpp_pgdraw", (DL_FUNC) &_Spillover_rcpp_pgdraw, 2},
@@ -262,8 +245,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_Spillover_rcpparma_bothproducts", (DL_FUNC) &_Spillover_rcpparma_bothproducts, 1},
     {"_Spillover_sigma2_w_update", (DL_FUNC) &_Spillover_sigma2_w_update, 4},
     {"_Spillover_spatial_corr_fun", (DL_FUNC) &_Spillover_spatial_corr_fun, 2},
-    {"_Spillover_Spillover", (DL_FUNC) &_Spillover_Spillover, 23},
-    {"_Spillover_theta_update", (DL_FUNC) &_Spillover_theta_update, 14},
+    {"_Spillover_Spillover", (DL_FUNC) &_Spillover_Spillover, 22},
+    {"_Spillover_theta_update", (DL_FUNC) &_Spillover_theta_update, 15},
     {"_Spillover_w_aux_update", (DL_FUNC) &_Spillover_w_aux_update, 7},
     {"_Spillover_w_update", (DL_FUNC) &_Spillover_w_update, 9},
     {NULL, NULL, 0}

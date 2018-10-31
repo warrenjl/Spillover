@@ -7,17 +7,17 @@ using namespace Rcpp;
 // [[Rcpp::export]]
 
 Rcpp::List Spillover(int mcmc_samples,
+                     int spillover_covar_def, //1: Change point; 2: Exponential; 3: Gaussian 
                      arma::vec y,
                      arma::mat x,
                      arma::vec distance_to_ps,
                      arma::mat z,
                      arma::mat spatial_dists,
-                     double a_theta_prior,
-                     double b_theta_prior,
                      double metrop_var_phi_trans,
                      double metrop_var_theta_trans,
-                     Rcpp::Nullable<double> alpha_g_prior = R_NilValue,
-                     Rcpp::Nullable<double> beta_g_prior = R_NilValue,
+                     Rcpp::Nullable<double> sigma2_regress_prior = R_NilValue,
+                     Rcpp::Nullable<double> a_theta_prior = R_NilValue,
+                     Rcpp::Nullable<double> b_theta_prior = R_NilValue,
                      Rcpp::Nullable<double> alpha_phi_prior = R_NilValue,
                      Rcpp::Nullable<double> beta_phi_prior = R_NilValue,
                      Rcpp::Nullable<double> alpha_sigma2_w_prior = R_NilValue,
@@ -25,7 +25,6 @@ Rcpp::List Spillover(int mcmc_samples,
                      Rcpp::Nullable<Rcpp::NumericVector> beta_init = R_NilValue,
                      Rcpp::Nullable<double> lambda_init = R_NilValue,
                      Rcpp::Nullable<Rcpp::NumericVector> w_init = R_NilValue,
-                     Rcpp::Nullable<double> g_init = R_NilValue,
                      Rcpp::Nullable<double> phi_init = R_NilValue,
                      Rcpp::Nullable<double> theta_init = R_NilValue,
                      Rcpp::Nullable<double> sigma2_w_init = R_NilValue){
@@ -34,24 +33,25 @@ Rcpp::List Spillover(int mcmc_samples,
 arma::mat beta(x.n_cols, mcmc_samples); beta.fill(0);
 arma::vec lambda(mcmc_samples); lambda.fill(0);
 arma::mat w(z.n_cols, mcmc_samples); w.fill(0);
-arma::vec g(mcmc_samples); g.fill(0);
 arma::vec phi(mcmc_samples); phi.fill(0);
 arma::vec theta(mcmc_samples); theta.fill(0);
 arma::vec sigma2_w(mcmc_samples); sigma2_w.fill(0);
 arma::vec neg_two_loglike(mcmc_samples); neg_two_loglike.fill(0);
   
 //Prior Information
-double a_theta = a_theta_prior;
-double b_theta = b_theta_prior;
-
-double alpha_g = 3.00;
-if(alpha_g_prior.isNotNull()){
-  alpha_g = Rcpp::as<double>(alpha_g_prior);
+double sigma2_regress = 10000.00;
+if(sigma2_regress_prior.isNotNull()){
+  sigma2_regress = Rcpp::as<double>(sigma2_regress_prior);
   }
 
-double beta_g = 2.00;
-if(beta_g_prior.isNotNull()){
-  beta_g = Rcpp::as<double>(beta_g_prior);
+double a_theta = min(distance_to_ps);
+if(a_theta_prior.isNotNull()){
+  a_theta = Rcpp::as<double>(a_theta_prior);
+  }
+
+double b_theta = max(distance_to_ps);
+if(b_theta_prior.isNotNull()){
+  b_theta = Rcpp::as<double>(b_theta_prior);
   }
   
 double alpha_phi = 1.00;
@@ -90,17 +90,12 @@ if(w_init.isNotNull()){
   w.col(0) = Rcpp::as<arma::vec>(w_init);
   }
 
-g(0) = 1.00;
-if(g_init.isNotNull()){
-  g(0) = Rcpp::as<double>(g_init);
-  }
-
 phi(0) = 0.50*max(distance_to_ps);
 if(phi_init.isNotNull()){
   phi(0) = Rcpp::as<double>(phi_init);
   }
 
-theta(0) = 0.50*(b_theta_prior - a_theta_prior);
+theta(0) = 0.50*(b_theta - a_theta);
 if(theta_init.isNotNull()){
   theta(0) = Rcpp::as<double>(theta_init);
   }
@@ -113,7 +108,14 @@ if(sigma2_w_init.isNotNull()){
 Rcpp::List spatial_corr_info = spatial_corr_fun(phi(0),
                                                 spatial_dists);
 
-arma::vec spillover_covar = (distance_to_ps <= theta(0))%exp(-(distance_to_ps%distance_to_ps));
+arma::vec spillover_covar_temp(y.size()); spillover_covar_temp.fill(1);
+arma::vec spillover_covar = (distance_to_ps <= theta(0))%spillover_covar_temp;
+if(spillover_covar_def == 2){
+  spillover_covar = (distance_to_ps <= theta(0))%exp(-distance_to_ps);
+  }
+if(spillover_covar_def == 3){
+  spillover_covar = (distance_to_ps <= theta(0))%exp(-(distance_to_ps%distance_to_ps));
+  }
 
 neg_two_loglike(0) = neg_two_loglike_update(y,
                                             x,
@@ -149,18 +151,10 @@ for(int j = 1; j < mcmc_samples; ++j){
                                               w_aux,
                                               gamma,
                                               w.col(j-1),
-                                              g(j-1));
+                                              sigma2_regress);
    
    beta.col(j) = beta_lambda.subvec(0, (x.n_cols - 1));
    lambda(j) = beta_lambda(x.n_cols);
-   
-   //g update
-   g(j) = g_update(x,
-                   spillover_covar,
-                   beta.col(j),
-                   lambda(j),
-                   alpha_g,
-                   beta_g);
   
    //w Update
    w.col(j) = w_update(x,
@@ -204,7 +198,8 @@ for(int j = 1; j < mcmc_samples; ++j){
                                           beta.col(j),
                                           lambda(j),
                                           w.col(j),
-                                          g(j),
+                                          spillover_covar_temp,
+                                          spillover_covar_def,
                                           a_theta,
                                           b_theta,
                                           metrop_var_theta_trans,
@@ -212,7 +207,13 @@ for(int j = 1; j < mcmc_samples; ++j){
    
    theta(j) = theta_output[0];
    acctot_theta_trans = theta_output[1];
-   spillover_covar = (distance_to_ps <= theta(j))%exp(-(distance_to_ps%distance_to_ps));
+   spillover_covar = (distance_to_ps <= theta(j))%spillover_covar_temp;
+   if(spillover_covar_def == 2){
+     spillover_covar = (distance_to_ps <= theta(j))%exp(-distance_to_ps);
+     }
+   if(spillover_covar_def == 3){
+     spillover_covar = (distance_to_ps <= theta(j))%exp(-(distance_to_ps%distance_to_ps));
+     }
    
    //neg_two_loglike Update
    neg_two_loglike(j) = neg_two_loglike_update(y,
@@ -229,13 +230,24 @@ for(int j = 1; j < mcmc_samples; ++j){
      }
      
    if(((j + 1) % int(round(mcmc_samples*0.10)) == 0)){
+     if(spillover_covar_def == 1){
+       Rcpp::Rcout << "**********************" << std::endl;
+       Rcpp::Rcout << "Change Point Spillover" << std::endl;
+       }
+     if(spillover_covar_def == 2){
+       Rcpp::Rcout << "*********************" << std::endl;
+       Rcpp::Rcout << "Exponential Spillover" << std::endl;
+       }
+     if(spillover_covar_def == 3){
+       Rcpp::Rcout << "*********************" << std::endl;
+       Rcpp::Rcout << "Gaussian Spillover" << std::endl;
+      }
      double completion = round(100*((j + 1)/(double)mcmc_samples));
      Rcpp::Rcout << "Progress: " << completion << "%" << std::endl;
      double accrate_phi_trans = round(100*(acctot_phi_trans/j));
      Rcpp::Rcout << "phi Acceptance: " << accrate_phi_trans << "%" << std::endl;
      double accrate_theta_trans = round(100*(acctot_theta_trans/j));
      Rcpp::Rcout << "theta Acceptance: " << accrate_theta_trans << "%" << std::endl;
-     Rcpp::Rcout << "*********************" << std::endl;
      }
      
    }
@@ -243,7 +255,6 @@ for(int j = 1; j < mcmc_samples; ++j){
 return Rcpp::List::create(Rcpp::Named("beta") = beta,
                           Rcpp::Named("lambda") = lambda,
                           Rcpp::Named("w") = w,
-                          Rcpp::Named("g") = g,
                           Rcpp::Named("sigma2_w") = sigma2_w,
                           Rcpp::Named("phi") = phi,
                           Rcpp::Named("theta") = theta,
