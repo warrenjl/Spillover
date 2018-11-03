@@ -1,56 +1,77 @@
 ---
 output:
   word_document: default
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-# GPCW: Gaussian Process Model for Critical Window Estimation
+# Spillover: Spatial Change Point Estimation Due to Spillover from a Point Source
 
-## GPCW_Example
+## Spillover_Example
 
 [1] Simulate data from the proposed model:
 
 * Setting the reproducibility seed and initializing packages for data simulation: 
 ```{r}
-set.seed(8453)
+set.seed(4541)
 
-library(GPCW)  
+library(Spillover)
+library(geoR)  #Spatial covariance functions  
 library(mnormt)  #Multivariate normal distribution
 library(boot)  #Inverse logit transformation
 ```
 
 * Setting the global data values:
 ```{r}
-n<-5000  #Sample size
-m<-36  #Number of exposure time periods
-x<-matrix(1, 
-          nrow=n, 
-          ncol=1)  #Covariate design matrix
-z<-matrix(rnorm(n=(n*m)), 
-          nrow=n, 
-          ncol=m)  #Exposure design matrix
+n<-300  #Sample size
+m<-100  #Number of unique spatial locations
 
-for(j in 1:m){
-   z[,j]<-(z[,j] - median(z[,j]))/IQR(z[,j])  #Data standardization (interquartile range)
+unique_locations<-matrix(runif(2*m), 
+                         nrow=m, 
+                         ncol=2)
+ps_location<-unique_locations[1,]
+spatial_dists<-as.matrix(dist(unique_locations, 
+                              diag=TRUE, 
+                              upper=TRUE))
+z<-matrix(0, nrow=n, ncol=m)
+distance_to_ps<-rep(0, times=n)
+for(j in 1:n){
+   loc<-sample(c(1:m), 
+               size=1)
+   if(j <= round(0.10*n)){  #~10% located at the point source
+     loc<-1
+     }
+   z[j, loc]<-1  #Spatial random effect design matrix
+   distance_to_ps[j]<-spatial_dists[1, loc]
    }
+x<-matrix(1, nrow=n, ncol=2)
+x[,2]<-rnorm(n)  #Covariate design matrix
 ```
 
 * Setting the values for the statistical model parameters:
 ```{r}
-beta_true<- -0.30
-sigma2_theta_true<-0.50
-phi_true<-0.01
-Sigma_true<-sigma2_theta_true*chol2inv(chol(temporal_corr_fun(m, 
-                                                              phi_true)[[1]]))
-theta_true<-rmnorm(n=1, 
-                   mean=rep(0, times=m), 
-                   varcov=Sigma_true)
-theta_true<-theta_true - mean(theta_true)
-logit_p_true<-x%*%beta_true + 
-              z%*%theta_true
+beta_true<-c(-0.50, 0.30)
+lambda_true<-2.00
+
+theta_true<-0.50
+x_full_true<-cbind(x, 
+                   as.numeric(distance_to_ps <= theta_true)*exp(-(distance_to_ps^2)))
+
+phi_true<-0.70
+spatial_corr_true<-spatial_corr<-cov.spatial(spatial_dists,
+                                             cov.model="spherical",
+                                             cov.pars=c(1, (1/phi_true)))
+sigma2_w_true<-0.75
+w_true<-c(rmnorm(n=1, 
+                 mean=rep(0, times=m), 
+                 varcov=(sigma2_w_true*spatial_corr_true)))
+w_true<-w_true - mean(w_true)
+
+logit_p_true<-x_full_true%*%c(beta_true, lambda_true) + 
+              z%*%w_true
+
 probs_true<-inv.logit(logit_p_true)
 hist(probs_true)
 ```
@@ -62,44 +83,72 @@ y<-rbinom(n=n,
           prob=probs_true)
 ```
 
-[2] Fit GPCW to estimate critical windows of susceptibility:
+[2] Fit Spillover to the Data:
 
 ```{r echo=TRUE}
-results<-GPCW(mcmc_samples = 10000,
-              y = y, x = x, z = z,
-              metrop_var_phi_trans = 1.15)
+results<-Spillover(mcmc_samples = 20000,
+                   spillover_covar_def = 3, #1: Change point; 2: Exponential; 3: Gaussian 
+                   y = y,
+                   x = x,
+                   distance_to_ps = distance_to_ps,
+                   z = z,
+                   spatial_dists = spatial_dists,
+                   metrop_var_phi_trans = 0.35,
+                   metrop_var_theta_trans = 0.10)
 ```
 
 [3]  Analyzing Output:
 
 ```{r}
 par(mfrow=c(2,2))
-plot(results$beta[1, 1001:10000], 
+plot(results$beta[1, 2001:20000], 
      type="l",
-     ylab="beta",
+     ylab="beta1",
      xlab="Sample")
-abline(h=beta_true,
+abline(h=beta_true[1],
        col="red",
        lwd=2)  #True value
-plot(results$sigma2_theta[1001:10000],
+plot(results$beta[2, 2001:20000], 
      type="l",
-     ylab="sigma2_theta",
+     ylab="beta2",
      xlab="Sample")
-abline(h=sigma2_theta_true,
+abline(h=beta_true[2],
        col="red",
        lwd=2)  #True value
-plot(results$phi[1001:10000],
+plot(results$lambda[2001:20000], 
+     type="l",
+     ylab="lambda",
+     xlab="Sample")
+abline(h=lambda_true,
+       col="red",
+       lwd=2)  #True value
+plot(results$theta[2001:20000], 
+     type="l",
+     ylab="theta",
+     xlab="Sample")
+abline(h=theta_true,
+       col="red",
+       lwd=2)  #True value
+
+par(mfrow=c(2,2))
+plot(results$sigma2_w[2001:20000],
+     type="l",
+     ylab="sigma2_w",
+     xlab="Sample")
+abline(h=sigma2_w_true,
+       col="red",
+       lwd=2)  #True value
+plot(results$phi[2001:20000],
      type="l",
      ylab="phi",
      xlab="Sample")
 abline(h=phi_true, 
        col="red",
        lwd=2)  #True value
-plot(rowMeans(results$theta[,1001:10000]), 
+plot(rowMeans(results$w[,2001:20000]), w_true,
      pch=16,
-     ylab="theta",
-     xlab="Time")
-points(theta_true, 
-       pch=16, 
-       col="red")  #True values
+     ylab="True w",
+     xlab="Estimated w")
+abline(a=0, 
+       b=1)
 ```
