@@ -27,7 +27,7 @@ for(int j = 0; j < p_z; ++j){
 arma::mat z_trans = trans(z);
   
 arma::mat cov_w = inv_sympd(z_trans*(w_aux_mat%z) + 
-                            (1/sigma2_w_old)*corr_inv);
+                            (1.00/sigma2_w_old)*corr_inv);
 
 arma::vec mean_w = cov_w*(z_trans*(w_aux%(gamma - x*beta - spillover_covar*lambda)));
   
@@ -35,7 +35,7 @@ arma::mat ind_norms = arma::randn(1, p_z);
 arma::vec w = mean_w + 
               trans(ind_norms*arma::chol(cov_w));
 
-w = w - mean(w);
+w = w - mean(w);  //Centering for stability 
   
 return(w);
   

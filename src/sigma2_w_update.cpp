@@ -20,7 +20,7 @@ double beta_sigma2_w_update = 0.50*dot(w, ((corr_inv)*w)) +
                               beta_sigma2_w;
 
 double sigma2_w = 1/R::rgamma(alpha_sigma2_w_update,
-                              (1/beta_sigma2_w_update));
+                              (1.00/beta_sigma2_w_update));
 
 return(sigma2_w);
 

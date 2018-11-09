@@ -20,7 +20,7 @@ Rcpp::List theta_update(arma::mat x,
                         double a_theta,
                         double b_theta,
                         double metrop_var_theta_trans,
-                        double acctot_theta_trans){
+                        int acctot_theta_trans){
 
 arma::vec beta_lambda(x.n_cols + 1);
 beta_lambda.subvec(0, (x.n_cols - 1)) = beta;
@@ -39,7 +39,7 @@ arma::mat x_full_old = join_rows(x, spillover_covar_old);
 
 double second = -0.50*dot((gamma - x_full_old*beta_lambda - z*w), (w_aux%(gamma - x_full_old*beta_lambda - z*w))) +
                 theta_trans_old -
-                2*log(1 + exp(theta_trans_old));
+                2.00*log(1.00 + exp(theta_trans_old));
 
 /*First*/
 double theta_trans = R::rnorm(theta_trans_old, 
@@ -56,11 +56,11 @@ arma::mat x_full = join_rows(x, spillover_covar);
 
 double first = -0.50*dot((gamma - x_full*beta_lambda - z*w), (w_aux%(gamma - x_full*beta_lambda - z*w))) +
                theta_trans -
-               2*log(1 + exp(theta_trans));
+               2.00*log(1.00 + exp(theta_trans));
 
 /*Decision*/
 double ratio = exp(first - second);   
-double acc = 1;
+int acc = 1;
 if(ratio < R::runif(0, 1)){
   theta = theta_old;
   acc = 0;

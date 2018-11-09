@@ -126,8 +126,8 @@ neg_two_loglike(0) = neg_two_loglike_update(y,
                                             w.col(0));
 
 //Metropolis Settings
-double acctot_phi_trans = 0;
-double acctot_theta_trans = 0;
+int acctot_phi_trans = 0;
+int acctot_theta_trans = 0;
 
 //Main Sampling Loop
 for(int j = 1; j < mcmc_samples; ++j){

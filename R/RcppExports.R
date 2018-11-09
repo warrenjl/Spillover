@@ -17,22 +17,6 @@ rcpp_pgdraw <- function(b, c) {
     .Call(`_Spillover_rcpp_pgdraw`, b, c)
 }
 
-rcpparma_hello_world <- function() {
-    .Call(`_Spillover_rcpparma_hello_world`)
-}
-
-rcpparma_outerproduct <- function(x) {
-    .Call(`_Spillover_rcpparma_outerproduct`, x)
-}
-
-rcpparma_innerproduct <- function(x) {
-    .Call(`_Spillover_rcpparma_innerproduct`, x)
-}
-
-rcpparma_bothproducts <- function(x) {
-    .Call(`_Spillover_rcpparma_bothproducts`, x)
-}
-
 sigma2_w_update <- function(w, corr_inv, alpha_sigma2_w, beta_sigma2_w) {
     .Call(`_Spillover_sigma2_w_update`, w, corr_inv, alpha_sigma2_w, beta_sigma2_w)
 }

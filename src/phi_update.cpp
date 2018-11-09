@@ -14,7 +14,7 @@ Rcpp::List phi_update(arma::mat spatial_dists,
                       double alpha_phi,
                       double beta_phi,
                       double metrop_var_phi_trans,
-                      double acctot_phi_trans){
+                      int acctot_phi_trans){
 
 /*Second*/
 Rcpp::List spatial_corr_info_old = spatial_corr_info;
@@ -43,8 +43,8 @@ double first = -0.50*log_deter -
 
 /*Decision*/
 double ratio = exp(first - second);   
-double acc = 1;
-if(ratio < R::runif(0, 1)){
+int acc = 1;
+if(ratio < R::runif(0.00, 1.00)){
   phi = phi_old;
   spatial_corr_info = spatial_corr_info_old;
   acc = 0;

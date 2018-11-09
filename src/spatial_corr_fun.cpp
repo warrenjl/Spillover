@@ -10,14 +10,14 @@ Rcpp::List spatial_corr_fun(double phi,
                             arma::mat spatial_dists){
 
 int p_z = spatial_dists.n_cols;
-double log_deter = 0; 
-double sign = 0;     
+double log_deter = 0.00; 
+double sign = 0.00;     
 arma::mat spatial_corr(p_z, p_z); spatial_corr.fill(0);
 
 for(int j = 0; j < p_z; ++j){
    for(int k = 0; k < p_z; ++k){
-      if(spatial_dists(j,k) <= (1/phi)){
-        spatial_corr(j,k) = 1 - 
+      if(spatial_dists(j,k) <= (1.00/phi)){
+        spatial_corr(j,k) = 1.00 - 
                             1.50*phi*spatial_dists(j,k) + 
                             0.50*(phi*spatial_dists(j,k))*(phi*spatial_dists(j,k))*(phi*spatial_dists(j,k));
         }

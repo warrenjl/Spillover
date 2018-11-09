@@ -46,7 +46,7 @@ Rcpp::List phi_update(arma::mat spatial_dists,
                       double alpha_phi,
                       double beta_phi,
                       double metrop_var_phi_trans,
-                      double acctot_phi_trans);
+                      int acctot_phi_trans);
 
 Rcpp::List theta_update(arma::mat x,
                         arma::mat z,
@@ -62,7 +62,7 @@ Rcpp::List theta_update(arma::mat x,
                         double a_theta,
                         double b_theta,
                         double metrop_var_theta_trans,
-                        double acctot_theta_trans);
+                        int acctot_theta_trans);
 
 double neg_two_loglike_update(arma::vec y,
                               arma::mat x,

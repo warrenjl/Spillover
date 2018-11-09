@@ -21,7 +21,7 @@ arma::vec logit_probs = x*beta +
                         spillover_covar*lambda +
                         z*w;
 
-arma::vec probs = exp(logit_probs)/(1 + exp(logit_probs));
+arma::vec probs = exp(logit_probs)/(1.00 + exp(logit_probs));
 
 for(int j = 0; j < n; ++j){
    dens(j) = R::dbinom(y(j),
@@ -30,7 +30,7 @@ for(int j = 0; j < n; ++j){
                        TRUE);
    }
 
-double neg_two_loglike = -2.0*sum(dens);
+double neg_two_loglike = -2.00*sum(dens);
 
 return neg_two_loglike;
 
