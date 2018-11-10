@@ -15,7 +15,7 @@ double neg_two_loglike_update(arma::vec y,
                               arma::vec w){
 
 int n = y.size();
-arma::vec dens(n); dens.fill(0);
+arma::vec dens(n); dens.fill(0.00);
 
 arma::vec logit_probs = x*beta +
                         spillover_covar*lambda +

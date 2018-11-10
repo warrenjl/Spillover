@@ -61,7 +61,7 @@ double first = -0.50*dot((gamma - x_full*beta_lambda - z*w), (w_aux%(gamma - x_f
 /*Decision*/
 double ratio = exp(first - second);   
 int acc = 1;
-if(ratio < R::runif(0, 1)){
+if(ratio < R::runif(0.00, 1.00)){
   theta = theta_old;
   acc = 0;
   }

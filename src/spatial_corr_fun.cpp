@@ -12,7 +12,7 @@ Rcpp::List spatial_corr_fun(double phi,
 int p_z = spatial_dists.n_cols;
 double log_deter = 0.00; 
 double sign = 0.00;     
-arma::mat spatial_corr(p_z, p_z); spatial_corr.fill(0);
+arma::mat spatial_corr(p_z, p_z); spatial_corr.fill(0.00);
 
 for(int j = 0; j < p_z; ++j){
    for(int k = 0; k < p_z; ++k){

@@ -30,13 +30,13 @@ Rcpp::List Spillover(int mcmc_samples,
                      Rcpp::Nullable<double> sigma2_w_init = R_NilValue){
   
 //Defining Parameters and Quantities of Interest
-arma::mat beta(x.n_cols, mcmc_samples); beta.fill(0);
-arma::vec lambda(mcmc_samples); lambda.fill(0);
-arma::mat w(z.n_cols, mcmc_samples); w.fill(0);
-arma::vec phi(mcmc_samples); phi.fill(0);
-arma::vec theta(mcmc_samples); theta.fill(0);
-arma::vec sigma2_w(mcmc_samples); sigma2_w.fill(0);
-arma::vec neg_two_loglike(mcmc_samples); neg_two_loglike.fill(0);
+arma::mat beta(x.n_cols, mcmc_samples); beta.fill(0.00);
+arma::vec lambda(mcmc_samples); lambda.fill(0.00);
+arma::mat w(z.n_cols, mcmc_samples); w.fill(0.00);
+arma::vec phi(mcmc_samples); phi.fill(0.00);
+arma::vec theta(mcmc_samples); theta.fill(0.00);
+arma::vec sigma2_w(mcmc_samples); sigma2_w.fill(0.00);
+arma::vec neg_two_loglike(mcmc_samples); neg_two_loglike.fill(0.00);
   
 //Prior Information
 double sigma2_regress = 10000.00;
@@ -75,7 +75,7 @@ if(beta_sigma2_w_prior.isNotNull()){
   }
 
 //Initial Values
-beta.col(0).fill(0);
+beta.col(0).fill(0.00);
 if(beta_init.isNotNull()){
   beta.col(0) = Rcpp::as<arma::vec>(beta_init);
   }
@@ -85,7 +85,7 @@ if(lambda_init.isNotNull()){
   lambda(0) = Rcpp::as<double>(lambda_init);
   } 
 
-w.col(0).fill(0);
+w.col(0).fill(0.00);
 if(w_init.isNotNull()){
   w.col(0) = Rcpp::as<arma::vec>(w_init);
   }
@@ -108,7 +108,7 @@ if(sigma2_w_init.isNotNull()){
 Rcpp::List spatial_corr_info = spatial_corr_fun(phi(0),
                                                 spatial_dists);
 
-arma::vec spillover_covar_temp(y.size()); spillover_covar_temp.fill(1);
+arma::vec spillover_covar_temp(y.size()); spillover_covar_temp.fill(1.00);
 arma::vec spillover_covar = (distance_to_ps <= theta(0))%spillover_covar_temp;
 if(spillover_covar_def == 2){
   spillover_covar = (distance_to_ps <= theta(0))%exp(-distance_to_ps);
@@ -244,9 +244,9 @@ for(int j = 1; j < mcmc_samples; ++j){
       }
      double completion = round(100*((j + 1)/(double)mcmc_samples));
      Rcpp::Rcout << "Progress: " << completion << "%" << std::endl;
-     double accrate_phi_trans = round(100*(acctot_phi_trans/j));
+     double accrate_phi_trans = round(100*(acctot_phi_trans/(double)j));
      Rcpp::Rcout << "phi Acceptance: " << accrate_phi_trans << "%" << std::endl;
-     double accrate_theta_trans = round(100*(acctot_theta_trans/j));
+     double accrate_theta_trans = round(100*(acctot_theta_trans/(double)j));
      Rcpp::Rcout << "theta Acceptance: " << accrate_theta_trans << "%" << std::endl;
      }
      
