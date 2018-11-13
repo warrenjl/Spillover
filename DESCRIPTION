@@ -1,9 +1,9 @@
 Package: Spillover
 Type: Package
-Title: What the package does (short line)
+Title: Spatial Change Point Estimation Due to Spillover from a Point Source 
 Version: 1.0
 Date: 2018-10-18
-Author: Who wrote it
+Author: Joshua L. Warren
 Maintainer: Who to complain to <yourfault@somewhere.net>
 Description: More about what it does (maybe more than one line)
 License: What license is it under?
