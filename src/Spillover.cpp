@@ -90,7 +90,7 @@ if(w_init.isNotNull()){
   w.col(0) = Rcpp::as<arma::vec>(w_init);
   }
 
-phi(0) = 0.50*max(distance_to_ps);
+phi(0) = 0.01*max(distance_to_ps);
 if(phi_init.isNotNull()){
   phi(0) = Rcpp::as<double>(phi_init);
   }
