@@ -22,9 +22,10 @@ Rcpp::List theta_update(arma::mat x,
                         double metrop_var_theta_trans,
                         int acctot_theta_trans){
 
-arma::vec beta_lambda(x.n_cols + 1);
-beta_lambda.subvec(0, (x.n_cols - 1)) = beta;
-beta_lambda(x.n_cols) = lambda;
+int p_x = x.n_cols;
+arma::vec beta_lambda(p_x + 1);
+beta_lambda.subvec(0, (p_x - 1)) = beta;
+beta_lambda(p_x) = lambda;
   
 /*Second*/
 double theta_trans_old = log((theta_old - a_theta)/(b_theta - theta_old));

@@ -30,9 +30,12 @@ Rcpp::List Spillover(int mcmc_samples,
                      Rcpp::Nullable<double> sigma2_w_init = R_NilValue){
   
 //Defining Parameters and Quantities of Interest
-arma::mat beta(x.n_cols, mcmc_samples); beta.fill(0.00);
+int n = y.size();
+int p_x = x.n_cols;
+int p_z = z.n_cols;
+arma::mat beta(p_x, mcmc_samples); beta.fill(0.00);
 arma::vec lambda(mcmc_samples); lambda.fill(0.00);
-arma::mat w(z.n_cols, mcmc_samples); w.fill(0.00);
+arma::mat w(p_z, mcmc_samples); w.fill(0.00);
 arma::vec phi(mcmc_samples); phi.fill(0.00);
 arma::vec theta(mcmc_samples); theta.fill(0.00);
 arma::vec sigma2_w(mcmc_samples); sigma2_w.fill(0.00);
@@ -108,7 +111,7 @@ if(sigma2_w_init.isNotNull()){
 Rcpp::List spatial_corr_info = spatial_corr_fun(phi(0),
                                                 spatial_dists);
 
-arma::vec spillover_covar_temp(y.size()); spillover_covar_temp.fill(1.00);
+arma::vec spillover_covar_temp(n); spillover_covar_temp.fill(1.00);
 arma::vec spillover_covar = (distance_to_ps <= theta(0))%spillover_covar_temp;
 if(spillover_covar_def == 2){
   spillover_covar = (distance_to_ps <= theta(0))%exp(-distance_to_ps);
@@ -153,8 +156,8 @@ for(int j = 1; j < mcmc_samples; ++j){
                                               w.col(j-1),
                                               sigma2_regress);
    
-   beta.col(j) = beta_lambda.subvec(0, (x.n_cols - 1));
-   lambda(j) = beta_lambda(x.n_cols);
+   beta.col(j) = beta_lambda.subvec(0, (p_x - 1));
+   lambda(j) = beta_lambda(p_x);
   
    //w Update
    w.col(j) = w_update(x,
