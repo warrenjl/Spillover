@@ -1,7 +1,7 @@
 ---
 output:
-  word_document: default
   pdf_document: default
+  word_document: default
   html_document: default
 ---
 # Spillover: Spatial Change Point Estimation Due to Spillover from a Point Source
@@ -61,5 +61,5 @@ $\phi \sim \text{Gamma}\left(\alpha_{\phi}, \beta_{\phi}\right);$
 
 * $\sigma^2_w = 1$;
 
-* $\phi = \max\left\{||\textbf{s}_i - \textbf{s}_p||: i=1,...,n\right\}/2$.
+* $\phi = 0.01\max\left\{||\textbf{s}_i - \textbf{s}_p||: i=1,...,n\right\}$.
 
