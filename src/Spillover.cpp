@@ -186,8 +186,8 @@ for(int j = 1; j < mcmc_samples; ++j){
                                       beta_phi,
                                       metrop_var_phi_trans,
                                       acctot_phi_trans);
-     
-   phi(j) = phi_output[0];
+
+   phi(j) = Rcpp::as<double>(phi_output[0]);
    acctot_phi_trans = phi_output[1];
    spatial_corr_info = phi_output[2];
    
@@ -208,7 +208,7 @@ for(int j = 1; j < mcmc_samples; ++j){
                                           metrop_var_theta_trans,
                                           acctot_theta_trans);
    
-   theta(j) = theta_output[0];
+   theta(j) = Rcpp::as<double>(theta_output[0]);
    acctot_theta_trans = theta_output[1];
    spillover_covar = (distance_to_ps <= theta(j))%spillover_covar_temp;
    if(spillover_covar_def == 2){
