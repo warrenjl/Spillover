@@ -7,7 +7,7 @@ output:
 # Spillover: Spatial Change Point Estimation Due to Spillover from a Point Source
 
 ## Statistical Model
-$$y_i\left(\textbf{s}_i\right)|p_i\left(\textbf{s}_i\right) \stackrel{\text{ind}}{\sim} \text{Bernoulli}\left(p_i\left(\textbf{s}_i\right)\right),\ i=1,...,n;$$
+$$Y_i\left(\textbf{s}_i\right)|p_i\left(\textbf{s}_i\right) \stackrel{\text{ind}}{\sim} \text{Bernoulli}\left(p_i\left(\textbf{s}_i\right)\right),\ i=1,...,n;$$
 
 $$\log\left(\frac{p_i\left(\textbf{s}_i\right)}{1 - p_i\left(\textbf{s}_i\right)}\right) = \textbf{x}_i^{\text{T}} \boldsymbol{\beta} + \lambda g\left(||\textbf{s}_i - \textbf{s}_p||; \theta\right) + w\left(\textbf{s}_i\right);$$
 
