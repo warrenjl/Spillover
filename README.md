@@ -5,3 +5,5 @@ This package implements a hierarchical Bayesian logistic regression analysis to 
 # Reference
 * Warren JL, Grandjean L, Moore DAJ, Lithgow A, Coronel J, Sheen P, Zelner JL, Andrews JR, and Cohen T (2018). Investigating spillover of multidrug-resistant tuberculosis from a prison: a spatial and molecular epidemiological analysis. BMC Medicine, 16(122):1-9.
 
+https://bmcmedicine.biomedcentral.com/articles/10.1186/s12916-018-1111-x
+
