@@ -18,7 +18,8 @@ arma::vec mean_w_aux = x*beta_old +
                        spillover_covar*lambda_old +
                        z*w_old;
 
-arma::vec w_aux = rcpp_pgdraw(1.00,
+arma::vec input(1); input.fill(1.00);
+arma::vec w_aux = rcpp_pgdraw(input,
                               mean_w_aux);
 
 arma::vec gamma = (y - 0.50)/w_aux;

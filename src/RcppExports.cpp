@@ -6,6 +6,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // Spillover
 Rcpp::List Spillover(int mcmc_samples, int spillover_covar_def, arma::vec y, arma::mat x, arma::vec distance_to_ps, arma::mat z, arma::mat spatial_dists, double metrop_var_phi_trans, double metrop_var_theta_trans, Rcpp::Nullable<double> sigma2_regress_prior, Rcpp::Nullable<double> a_theta_prior, Rcpp::Nullable<double> b_theta_prior, Rcpp::Nullable<double> alpha_phi_prior, Rcpp::Nullable<double> beta_phi_prior, Rcpp::Nullable<double> alpha_sigma2_w_prior, Rcpp::Nullable<double> beta_sigma2_w_prior, Rcpp::Nullable<Rcpp::NumericVector> beta_init, Rcpp::Nullable<double> lambda_init, Rcpp::Nullable<Rcpp::NumericVector> w_init, Rcpp::Nullable<double> phi_init, Rcpp::Nullable<double> theta_init, Rcpp::Nullable<double> sigma2_w_init);
 RcppExport SEXP _Spillover_Spillover(SEXP mcmc_samplesSEXP, SEXP spillover_covar_defSEXP, SEXP ySEXP, SEXP xSEXP, SEXP distance_to_psSEXP, SEXP zSEXP, SEXP spatial_distsSEXP, SEXP metrop_var_phi_transSEXP, SEXP metrop_var_theta_transSEXP, SEXP sigma2_regress_priorSEXP, SEXP a_theta_priorSEXP, SEXP b_theta_priorSEXP, SEXP alpha_phi_priorSEXP, SEXP beta_phi_priorSEXP, SEXP alpha_sigma2_w_priorSEXP, SEXP beta_sigma2_w_priorSEXP, SEXP beta_initSEXP, SEXP lambda_initSEXP, SEXP w_initSEXP, SEXP phi_initSEXP, SEXP theta_initSEXP, SEXP sigma2_w_initSEXP) {
@@ -92,12 +97,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_pgdraw
-arma::vec rcpp_pgdraw(double b, arma::vec c);
+arma::vec rcpp_pgdraw(arma::vec b, arma::vec c);
 RcppExport SEXP _Spillover_rcpp_pgdraw(SEXP bSEXP, SEXP cSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< double >::type b(bSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type b(bSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type c(cSEXP);
     rcpp_result_gen = Rcpp::wrap(rcpp_pgdraw(b, c));
     return rcpp_result_gen;

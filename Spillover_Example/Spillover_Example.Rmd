@@ -15,7 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 * Setting the reproducibility seed and initializing packages for data simulation: 
 ```{r}
-set.seed(4541)
+set.seed(7541)
 
 library(Spillover)
 library(geoR)  #Spatial covariance functions  
@@ -94,7 +94,7 @@ results<-Spillover(mcmc_samples = 20000,
                    z = z,
                    spatial_dists = spatial_dists,
                    metrop_var_phi_trans = 0.35,
-                   metrop_var_theta_trans = 0.10)
+                   metrop_var_theta_trans = 0.20)
 ```
 
 [3]  Analyzing Output:

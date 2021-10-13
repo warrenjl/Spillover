@@ -1,7 +1,7 @@
 #ifndef __Spillover__
 #define __Spillover__
 
-arma::vec rcpp_pgdraw(double b, 
+arma::vec rcpp_pgdraw(arma::vec b, 
                       arma::vec c);
 
 Rcpp::List spatial_corr_fun(double phi,
