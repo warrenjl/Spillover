@@ -15,6 +15,7 @@ Rcpp::List Spillover(int mcmc_samples,
                      arma::mat spatial_dists,
                      double metrop_var_phi_trans,
                      double metrop_var_theta_trans,
+                     Rcpp::Nullable<Rcpp::NumericVector> trials = R_NilValue,
                      Rcpp::Nullable<double> sigma2_regress_prior = R_NilValue,
                      Rcpp::Nullable<double> a_theta_prior = R_NilValue,
                      Rcpp::Nullable<double> b_theta_prior = R_NilValue,
@@ -40,6 +41,11 @@ arma::vec phi(mcmc_samples); phi.fill(0.00);
 arma::vec theta(mcmc_samples); theta.fill(0.00);
 arma::vec sigma2_w(mcmc_samples); sigma2_w.fill(0.00);
 arma::vec neg_two_loglike(mcmc_samples); neg_two_loglike.fill(0.00);
+  
+arma::vec tri_als(n); tri_als.fill(1);
+if(trials.isNotNull()){
+  tri_als = Rcpp::as<arma::vec>(trials);
+  }
   
 //Prior Information
 double sigma2_regress = 10000.00;
@@ -138,6 +144,7 @@ for(int j = 1; j < mcmc_samples; ++j){
    //w_aux Update
    Rcpp::List w_aux_output = w_aux_update(y,
                                           x,
+                                          tri_als,
                                           spillover_covar,
                                           z,
                                           beta.col(j-1),

@@ -74,12 +74,13 @@ logit_p_true<-x_full_true%*%c(beta_true, lambda_true) +
 
 probs_true<-inv.logit(logit_p_true)
 hist(probs_true)
+trials<-rep(1, times=n)
 ```
 
 * Simulating the analysis dataset:
 ```{r}
 y<-rbinom(n=n, 
-          size=1, 
+          size=trials, 
           prob=probs_true)
 ```
 
@@ -90,6 +91,7 @@ results<-Spillover(mcmc_samples = 20000,
                    spillover_covar_def = 3, #1: Change point; 2: Exponential; 3: Gaussian 
                    y = y,
                    x = x,
+                   trials = trials,
                    distance_to_ps = distance_to_ps,
                    z = z,
                    spatial_dists = spatial_dists,
