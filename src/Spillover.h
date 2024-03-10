@@ -67,6 +67,7 @@ Rcpp::List theta_update(arma::mat x,
 
 double neg_two_loglike_update(arma::vec y,
                               arma::mat x,
+                              arma::vec tri_als,
                               arma::vec spillover_covar,
                               arma::mat z, 
                               arma::vec beta,

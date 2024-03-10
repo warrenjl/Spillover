@@ -9,8 +9,8 @@ beta_lambda_update <- function(x, spillover_covar, z, w_aux, gamma, w_old, sigma
     .Call(`_Spillover_beta_lambda_update`, x, spillover_covar, z, w_aux, gamma, w_old, sigma2_regress)
 }
 
-neg_two_loglike_update <- function(y, x, spillover_covar, z, beta, lambda, w) {
-    .Call(`_Spillover_neg_two_loglike_update`, y, x, spillover_covar, z, beta, lambda, w)
+neg_two_loglike_update <- function(y, x, tri_als, spillover_covar, z, beta, lambda, w) {
+    .Call(`_Spillover_neg_two_loglike_update`, y, x, tri_als, spillover_covar, z, beta, lambda, w)
 }
 
 phi_update <- function(spatial_dists, phi_old, w, sigma2_w, spatial_corr_info, alpha_phi, beta_phi, metrop_var_phi_trans, acctot_phi_trans) {

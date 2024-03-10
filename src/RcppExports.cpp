@@ -62,19 +62,20 @@ BEGIN_RCPP
 END_RCPP
 }
 // neg_two_loglike_update
-double neg_two_loglike_update(arma::vec y, arma::mat x, arma::vec spillover_covar, arma::mat z, arma::vec beta, double lambda, arma::vec w);
-RcppExport SEXP _Spillover_neg_two_loglike_update(SEXP ySEXP, SEXP xSEXP, SEXP spillover_covarSEXP, SEXP zSEXP, SEXP betaSEXP, SEXP lambdaSEXP, SEXP wSEXP) {
+double neg_two_loglike_update(arma::vec y, arma::mat x, arma::vec tri_als, arma::vec spillover_covar, arma::mat z, arma::vec beta, double lambda, arma::vec w);
+RcppExport SEXP _Spillover_neg_two_loglike_update(SEXP ySEXP, SEXP xSEXP, SEXP tri_alsSEXP, SEXP spillover_covarSEXP, SEXP zSEXP, SEXP betaSEXP, SEXP lambdaSEXP, SEXP wSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
     Rcpp::traits::input_parameter< arma::mat >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type tri_als(tri_alsSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type spillover_covar(spillover_covarSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type z(zSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type beta(betaSEXP);
     Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type w(wSEXP);
-    rcpp_result_gen = Rcpp::wrap(neg_two_loglike_update(y, x, spillover_covar, z, beta, lambda, w));
+    rcpp_result_gen = Rcpp::wrap(neg_two_loglike_update(y, x, tri_als, spillover_covar, z, beta, lambda, w));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -201,7 +202,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_Spillover_Spillover", (DL_FUNC) &_Spillover_Spillover, 23},
     {"_Spillover_beta_lambda_update", (DL_FUNC) &_Spillover_beta_lambda_update, 7},
-    {"_Spillover_neg_two_loglike_update", (DL_FUNC) &_Spillover_neg_two_loglike_update, 7},
+    {"_Spillover_neg_two_loglike_update", (DL_FUNC) &_Spillover_neg_two_loglike_update, 8},
     {"_Spillover_phi_update", (DL_FUNC) &_Spillover_phi_update, 9},
     {"_Spillover_rcpp_pgdraw", (DL_FUNC) &_Spillover_rcpp_pgdraw, 2},
     {"_Spillover_sigma2_w_update", (DL_FUNC) &_Spillover_sigma2_w_update, 4},

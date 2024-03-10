@@ -8,6 +8,7 @@ using namespace Rcpp;
 
 double neg_two_loglike_update(arma::vec y,
                               arma::mat x,
+                              arma::vec tri_als,
                               arma::vec spillover_covar,
                               arma::mat z, 
                               arma::vec beta,
@@ -25,7 +26,7 @@ arma::vec probs = exp(logit_probs)/(1.00 + exp(logit_probs));
 
 for(int j = 0; j < n; ++j){
    dens(j) = R::dbinom(y(j),
-                       1,
+                       tri_als(j),
                        probs(j),
                        TRUE);
    }

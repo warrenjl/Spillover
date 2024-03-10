@@ -128,6 +128,7 @@ if(spillover_covar_def == 3){
 
 neg_two_loglike(0) = neg_two_loglike_update(y,
                                             x,
+                                            tri_als,
                                             spillover_covar,
                                             z, 
                                             beta.col(0),
@@ -228,6 +229,7 @@ for(int j = 1; j < mcmc_samples; ++j){
    //neg_two_loglike Update
    neg_two_loglike(j) = neg_two_loglike_update(y,
                                                x,
+                                               tri_als,
                                                spillover_covar,
                                                z, 
                                                beta.col(j),
